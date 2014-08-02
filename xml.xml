@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="gbk" ?>
+<xml4nlp>
+    <note sent="y" word="y" pos="y" ne="y" parser="y" wsd="y" srl="y" />
+    <doc>
+        <para id="0">
+            <sent id="0" cont="当时拍这个短片，完全出于一种兴趣。">
+                <word id="0" cont="当时" wsd="Ca31" wsdexp="这时_那时_几时" pos="nt" ne="S-Nt" parent="1" relate="ADV" />
+                <word id="1" cont="拍" wsd="Hh03" wsdexp="摄影_录音_放映_广播" pos="v" ne="O" parent="-1" relate="HED" />
+                <word id="2" cont="这个" wsd="Ed61" wsdexp="这个_那个_某个_各个_其他_何" pos="r" ne="O" parent="3" relate="ATT" />
+                <word id="3" cont="短片" wsd="Dk29" wsdexp="戏剧_唱腔_舞蹈_电影_镜头" pos="n" ne="O" parent="1" relate="VOB" />
+                <word id="4" cont="，" wsd="-1" wsdexp="" pos="wp" ne="O" parent="-2" relate="WP" />
+                <word id="5" cont="完全" wsd="Ka06" wsdexp="完全_彻底_半半拉拉" pos="a" ne="O" parent="6" relate="ADV" />
+                <word id="6" cont="出于" wsd="Kc09" wsdexp="因为_所以" pos="v" ne="O" parent="1" relate="VV">
+                    <arg id="0" type="ADV" beg="5" end="5" />
+                    <arg id="1" type="A1" beg="9" end="9" />
+                </word>
+                <word id="7" cont="一" wsd="Dn04" wsdexp="基数_序数" pos="m" ne="B-Nm" parent="8" relate="QUN" />
+                <word id="8" cont="种" wsd="Dn08" wsdexp="数量单位" pos="q" ne="E-Nm" parent="9" relate="ATT" />
+                <word id="9" cont="兴趣" wsd="Df12" wsdexp="兴趣_嗜好" pos="n" ne="O" parent="6" relate="VOB" />
+                <word id="10" cont="。" wsd="-1" wsdexp="" pos="wp" ne="O" parent="-2" relate="WP" />
+            </sent>
+        </para>
+    </doc>
+</xml4nlp>

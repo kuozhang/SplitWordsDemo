@@ -1,0 +1,4 @@
+*Vertices 2
+1 "BOF"
+2 "EOF"
+*arcs
