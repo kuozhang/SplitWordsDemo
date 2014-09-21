@@ -2,13 +2,14 @@
 package test;
 
 import java.awt.Button;
-import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,25 +23,22 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import ICTCLAS.I3S.AC.ICTCLAS50;
+import ICTCLAS.I3S.AC.ICTCLAS50Util;
 
 import com.patent.read.ReadFile;
 
 @SuppressWarnings( "serial" )
 class SplitWordsWindow extends Frame
 {
-
     public static void popUpWindow()
     {
         new SplitWordsWindow();
     }
 
     private Button btn_openFile, btn_extract, btn_generateMatrix, btn_clear, btn_exit;
-    private JLabel label_thresh;
+    private JLabel label_threshold;
     private TextField tf_threadhold;
     private TextArea ta_result;
-    private ICTCLAS50 testICTCLAS50;
-    private File keywordFile; // 关键词
     private int threshold = 1; // 阀值
     private static String KEYWORD_EXTRACTION = "Keyword Extraction";
     private static String OPEN_FILE = "打开文件";
@@ -50,21 +48,22 @@ class SplitWordsWindow extends Frame
     private static String CLEAR = "清除";
     private static String EXIT = "退出";
 
-    // Specify the source file and participle file here
+    // Specify the source file, participle file, and keyword file
     String sourceFilePath = "sourcefile\\sourcefile.txt";
     String participleFilePath = "participlefile\\participlefile.txt";
+    String keywordFileName = "keywordfile.txt";
 
     File[] filelist;
 
     String s = "";
 
-    public SplitWordsWindow()
+    private SplitWordsWindow()
     {
         super( KEYWORD_EXTRACTION );
 
         ta_result = new TextArea( 50, 65 );
         btn_openFile = new Button( OPEN_FILE );
-        label_thresh = new JLabel( INPUT_THREAD );
+        label_threshold = new JLabel( INPUT_THREAD );
         tf_threadhold = new TextField();
         btn_extract = new Button( EXTRACT );
         btn_generateMatrix = new Button( GENERATE_MATRIX );// 后期要改成生成PAJEK图；
@@ -73,7 +72,7 @@ class SplitWordsWindow extends Frame
         setLayout( new FlowLayout() );
 
         add( btn_openFile );
-        add( label_thresh );
+        add( label_threshold );
         add( tf_threadhold );
         add( btn_extract );
         add( btn_generateMatrix );
@@ -88,25 +87,36 @@ class SplitWordsWindow extends Frame
         btn_exit.addActionListener( new ListenerForExit() );
 
         setSize( 500, 500 );
+        setVisible( true );
 
-        keywordFile = new File( "keywordfile.txt" );
-        testICTCLAS50 = new ICTCLAS50();
-
-        try
+        addWindowListener( new WindowListener()
         {
-            String argu = ".";
-            if( testICTCLAS50.ICTCLAS_Init( argu.getBytes( "GB2312" ) ) == true )
+            @Override
+            public void windowOpened( WindowEvent e ){}
+
+            @Override
+            public void windowIconified( WindowEvent e ){}
+
+            @Override
+            public void windowDeiconified( WindowEvent e ){}
+
+            @Override
+            public void windowDeactivated( WindowEvent e ){}
+
+            // active close button
+            @Override
+            public void windowClosing( WindowEvent e )
             {
-                setVisible( true );
-                System.out.println( "init true" );
+                dispose();
+                System.exit( 0 );
             }
-            else
-                System.out.println( "init false" );
-        }
-        catch( Exception ex )
-        {
-            // do nothig
-        }
+
+            @Override
+            public void windowClosed( WindowEvent e ){}
+
+            @Override
+            public void windowActivated( WindowEvent e ){}
+        } );
     }
 
     private String filterString( String str )
@@ -145,7 +155,7 @@ class SplitWordsWindow extends Frame
         @Override
         public void actionPerformed( ActionEvent e )
         {
-            if( e.getActionCommand() == CLEAR )
+            if( e.getActionCommand().equals( CLEAR ) )
             {
                 tf_threadhold.setText( null );
                 ta_result.setText( null );
@@ -157,19 +167,12 @@ class SplitWordsWindow extends Frame
     }
     private class ListenerForExit implements ActionListener
     {
-
         @Override
         public void actionPerformed( ActionEvent e )
         {
-            if( e.getActionCommand() == EXIT )
-            {
-                testICTCLAS50.ICTCLAS_Exit();
-                dispose();
-                System.exit( 0 );
-            }
-
+            dispose();
+            System.exit( 0 );
         }
-
     }
 
     private class ListenerForExtract implements ActionListener
@@ -177,7 +180,7 @@ class SplitWordsWindow extends Frame
         @Override
         public void actionPerformed( ActionEvent e )
         {
-            if( e.getActionCommand() == EXTRACT )
+            if( e.getActionCommand().equals( EXTRACT ) )
             {
 
                 if( filelist == null || filelist.length == 0 )
@@ -218,10 +221,10 @@ class SplitWordsWindow extends Frame
                     String sourceText = temp.toString();
                     writeToFile( sourceFile, sourceText );
 
-                    // 将多个文本的切词文件写到participlefile.txt中
-                    byte nativeBytes[] = testICTCLAS50.ICTCLAS_ParagraphProcess( sourceText.getBytes( "GB2312" ), 0, 1 );
-                    String nativeStr = new String( nativeBytes, 0, nativeBytes.length, "GB2312" );
+                    String nativeStr =
+                        ICTCLAS50Util.processParagraphWithoutUsrDict( sourceText, ICTCLAS50Util.ENCODE_TYPE_UNKNOW, true );
 
+                    // 将多个文本的切词文件写到participlefile.txt中
                     File participleFile = new File( participleFilePath );
                     if( !participleFile.exists() )
                     {
@@ -258,9 +261,10 @@ class SplitWordsWindow extends Frame
         @Override
         public void actionPerformed( ActionEvent e )
         {
-            if( e.getActionCommand() == GENERATE_MATRIX )
+            if( e.getActionCommand().equals( GENERATE_MATRIX ) )
             {
                 ExtractCoWordArray coword = new ExtractCoWordArray();
+                File keywordFile = new File( keywordFileName );
                 coword.getCowordArray( filelist, keywordFile );
             }
 
@@ -273,7 +277,7 @@ class SplitWordsWindow extends Frame
         @Override
         public void actionPerformed( ActionEvent e )
         {
-            if( e.getActionCommand() == OPEN_FILE )
+            if( e.getActionCommand().equals( OPEN_FILE ) )
             {
                 // 打开源文件，并将选择的文件保存到文件数组中
                 String path = ( "sourcefile" );
@@ -295,6 +299,4 @@ class SplitWordsWindow extends Frame
         }
 
     }
-    
-    
 }

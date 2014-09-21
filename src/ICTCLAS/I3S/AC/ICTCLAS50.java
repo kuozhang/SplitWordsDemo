@@ -1,5 +1,5 @@
 package ICTCLAS.I3S.AC;
-import java.io.*;
+
 public class ICTCLAS50
 {
 	//public enum eCodeType
@@ -19,7 +19,9 @@ public class ICTCLAS50
 	public native boolean ICTCLAS_FileProcess(byte[] sSrcFilename, int eCodeType, int bPOSTagged,byte[] sDestFilename);
 	public native byte[] ICTCLAS_ParagraphProcess(byte[] sSrc, int eCodeType, int bPOSTagged);
 	public native byte[] nativeProcAPara(byte[] sSrc, int eCodeType, int bPOStagged);
+
 	/* Use static intializer */
+
 	static
 	{
 		System.loadLibrary("ICTCLAS50");
