@@ -1,7 +1,7 @@
 package test;
 
 /**
- * Statr entry
+ * Entry
  *
  */
 public class Entry{
